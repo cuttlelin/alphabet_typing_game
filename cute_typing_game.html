@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👑 可愛打字魔法挑戰 👑</title>
+    <style>
+        /* CSS 樣式 (保持不變) */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #FFDAB9 0%, #FFB6C1 50%, #ADD8E6 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .game-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+            border: 6px solid #FF69B4;
+            position: relative;
+        }
+
+        h1 {
+            color: #C71585;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px #FFDAB9;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #F0FFF0;
+            border-radius: 10px;
+            border: 2px solid #90EE90;
+        }
+        
+        .control-group {
+            margin-bottom: 10px;
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        .controls label, .controls select {
+            margin-right: 15px;
+            font-weight: bold;
+            color: #6A5ACD;
+            font-size: 1.1em;
+        }
+        
+        .controls select {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #FFC0CB;
+        }
+
+        #target-letter-box {
+            background-color: #F0F8FF;
+            border: 10px solid #FFC0CB;
+            border-radius: 20px;
+            padding: 30px 0;
+            margin: 20px auto;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 25px rgba(255, 105, 180, 0.7);
+            transition: transform 0.1s, box-shadow 0.3s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .sparkle-effect {
+            box-shadow: 0 0 40px 10px #FFFF00, 0 0 80px 20px #FFD700;
+            transform: scale(1.05);
+        }
+
+        .shake-effect {
+            animation: shake 0.2s ease-in-out;
+            box-shadow: 0 0 25px 5px #FF4500;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            25% { transform: translate(-1px, -2px) rotate(-1deg); }
+            50% { transform: translate(1px, 2px) rotate(1deg); }
+            75% { transform: translate(-1px, -1px) rotate(-1deg); }
+            100% { transform: translate(1px, 1px) rotate(0deg); }
+        }
+
+        #target-letter {
+            font-size: 10em;
+            font-weight: bold;
+            color: #8A2BE2;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .info-board {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+        
+        .info-item {
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        
+        #data-board {
+            background-color: #F0FFFF;
+            color: #008B8B;
+            border: 2px solid #87CEFA;
+        }
+
+        #timer-board {
+            background-color: #E6E6FA;
+            color: #4B0082;
+            border: 2px solid #DDA0DD;
+        }
+        
+        #score-board {
+            background-color: #FFE4E1;
+            color: #FF1493;
+            border: 2px solid #FFB6C1;
+        }
+        
+        .result-detail {
+            background-color: #FFF0F5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px dashed #FF69B4;
+            font-size: 1.1em;
+            text-align: left;
+        }
+        
+        .result-detail strong {
+            color: #C71585;
+            font-size: 1.2em;
+        }
+
+        .end-message {
+            color: #C71585;
+            font-size: 1.5em;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        
+        #star-rewards {
+            font-size: 3em;
+            margin: 10px 0;
+            color: gold;
+            text-shadow: 1px 1px 3px #DDA0DD;
+        }
+        
+        #perfect-star {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 15em;
+            color: #FFD700;
+            text-shadow: 0 0 10px #FF69B4, 0 0 20px #FFD700;
+            opacity: 0;
+            transition: opacity 1s;
+            pointer-events: none;
+        }
+        
+        .show-perfect {
+            opacity: 1 !important;
+            animation: bounce 0.5s ease-out;
+        }
+        
+        @keyframes bounce {
+            0% { transform: translate(-50%, -50%) scale(0.5); }
+            70% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        button {
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #FF1493;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #flash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0);
+            pointer-events: none;
+            transition: background-color 0.1s ease-out;
+            z-index: 1000;
+        }
+
+        .correct-flash {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        .wrong-flash {
+            background-color: rgba(255, 0, 0, 0.3);
+        }
+
+    </style>
+</head>
+<body>
+    
+    <div id="flash-overlay"></div>
+    
+    <div id="perfect-star">⭐</div>
+
+    <div class="game-container">
+        <h1>👑 迪士尼打字魔法挑戰 👑</h1>
+        <p>💡 挑戰開始！請按下鍵盤上顯示的字元！</p>
+
+        <div class="controls">
+            <div class="control-group">
+                 <label for="challenge-time">選擇挑戰時間:</label>
+                 <select id="challenge-time">
+                     <option value="60">60 秒 (1 分鐘)</option>
+                     <option value="120">120 秒 (2 分鐘)</option>
+                     <option value="300">300 秒 (5 分鐘)</option>
+                     <option value="0">不限時 (按停止才停)</option>
+                 </select>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="include-uppercase" checked> 字母大寫 (A-Z)
+                </label>
+                <label>
+                    <input type="checkbox" id="include-lowercase"> 字母小寫 (a-z)
+                </label>
+                <label>
+                    <input type="checkbox" id="include-symbols"> 數字/符號 (1-9!@#)
+                </label>
+            </div>
+        </div>
+        
+        <button id="start-button">開始魔法挑戰</button>
+        <button id="stop-button" style="display: none;">停止挑戰</button>
+
+        <div id="target-letter-box">
+            <span id="target-letter">A</span>
+        </div>
+
+        <div id="message-board"></div>
+
+        <div class="info-board">
+            <div id="timer-board" class="info-item">
+                時間：<span id="timer">0</span>
+            </div>
+            <div id="data-board" class="info-item">
+                總題數：<span id="total-count">0</span> | 準確率：<span id="accuracy-percent">0.00</span>%
+            </div>
+            <div id="score-board" class="info-item">
+                答對：<span id="score">0</span> | 答錯：<span id="wrong-count">0</span>
+            </div>
+        </div>
+        
+        <div id="result-details" style="display: none;"></div>
+        
+    </div>
+
+    <script>
+        // JavaScript 程式碼
+        const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        const symbols = '1234567890!@#$%^&*()';
+        
+        const targetLetterBox = document.getElementById('target-letter-box');
+        const targetLetterElement = document.getElementById('target-letter');
+        const messageBoard = document.getElementById('message-board');
+        const scoreElement = document.getElementById('score');
+        const wrongCountElement = document.getElementById('wrong-count');
+        const totalCountElement = document.getElementById('total-count');
+        const accuracyPercentElement = document.getElementById('accuracy-percent');
+        const timerElement = document.getElementById('timer');
+        const startButton = document.getElementById('start-button');
+        const stopButton = document.getElementById('stop-button');
+        const challengeTimeSelect = document.getElementById('challenge-time');
+        const infoBoard = document.querySelector('.info-board');
+        const resultDetails = document.getElementById('result-details');
+        const perfectStar = document.getElementById('perfect-star');
+        
+        const includeUppercase = document.getElementById('include-uppercase');
+        const includeLowercase = document.getElementById('include-lowercase');
+        const includeSymbols = document.getElementById('include-symbols');
+        const flashOverlay = document.getElementById('flash-overlay');
+        
+        
+        let availableChars = '';
+        let currentTarget = '';
+        let score = 0;
+        let wrongCount = 0;
+        let totalAnswered = 0;
+        let startTime = 0; 
+        let initialTime = 0; 
+        let timeLeft = 0;
+        let timerInterval = null;
+        let gameActive = false;
+
+        // --- 視覺特效函數 (保留) ---
+        function applyCorrectEffect() {
+            targetLetterBox.classList.add('sparkle-effect');
+            flashOverlay.classList.add('correct-flash');
+            
+            setTimeout(() => {
+                targetLetterBox.classList.remove('sparkle-effect');
+            }, 300);
+            
+            setTimeout(() => {
+                flashOverlay.classList.remove('correct-flash');
+            }, 150);
+        }
+
+        function applyWrongEffect() {
+            targetLetterBox.classList.add('shake-effect');
+            flashOverlay.classList.add('wrong-flash');
+            
+            setTimeout(() => {
+                targetLetterBox.classList.remove('shake-effect');
+            }, 200);
+            
+            setTimeout(() => {
+                flashOverlay.classList.remove('wrong-flash');
+            }, 150);
+        }
+
+        // --- 獎勵星號計算函數 ---
+        function getStarReward(correct, total) {
+            if (total === 0) return { stars: '☆☆☆', isPerfect: false, percentage: 0 };
+            
+            const accuracy = correct / total;
+            const percentage = (accuracy * 100).toFixed(2);
+            let stars = '';
+            let isPerfect = false;
+
+            // 修正：90% 以上 2.5 顆星，95% 以上 3 顆星
+            if (accuracy >= 0.95) {
+                stars = '⭐⭐⭐';
+                isPerfect = (correct === total);
+            } else if (accuracy >= 0.90) {
+                // 用符號難以表達 2.5 顆星，為了美觀，我們給予 3 顆星，但全對時才給大星鼓勵
+                stars = '⭐⭐⭐'; 
+            } else if (accuracy >= 0.60) {
+                stars = '⭐⭐';
+            } else if (accuracy >= 0.30) {
+                stars = '⭐';
+            } else {
+                stars = '☆☆☆';
+            }
+            
+            return { stars: stars, isPerfect: isPerfect, percentage: percentage };
+        }
+        
+        // 格式化時間 (秒 -> 分:秒)
+        function formatTime(seconds) {
+            if (seconds < 0) seconds = 0; // 防止負數時間顯示
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            const paddedSeconds = remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds;
+            return `${minutes}:${paddedSeconds}`;
+        }
+        
+        // 更新分數板數據
+        function updateScoreboard() {
+            scoreElement.textContent = score;
+            wrongCountElement.textContent = wrongCount;
+            totalAnswered = score + wrongCount;
+            totalCountElement.textContent = totalAnswered;
+            
+            const accuracy = totalAnswered > 0 ? (score / totalAnswered * 100).toFixed(2) : '0.00';
+            accuracyPercentElement.textContent = accuracy;
+        }
+
+        // 根據勾選框設定可用的字元集 (保留)
+        function updateAvailableChars() {
+            availableChars = '';
+            if (includeUppercase.checked) {
+                availableChars += uppercase;
+            }
+            if (includeLowercase.checked) {
+                availableChars += lowercase;
+            }
+            if (includeSymbols.checked) {
+                availableChars += symbols;
+            }
+            if (availableChars.length === 0) {
+                 availableChars = uppercase;
+                 includeUppercase.checked = true;
+                 alert("請至少選擇一種字元類型！已自動勾選「字母大寫」。");
+            }
+        }
+
+        // 隨機選出下一個目標字元
+        function setNextTarget() {
+            if (!gameActive) return;
+            
+            updateAvailableChars();
+            const randomIndex = Math.floor(Math.random() * availableChars.length);
+            currentTarget = availableChars[randomIndex];
+            targetLetterElement.textContent = currentTarget;
+            messageBoard.textContent = ''; 
+            messageBoard.className = ''; 
+        }
+
+        // 開始計時器
+        function startTimer() {
+            clearInterval(timerInterval);
+            startTime = Date.now(); 
+            
+            if (initialTime > 0) {
+                // 倒數計時模式
+                timerElement.textContent = formatTime(timeLeft);
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    timerElement.textContent = formatTime(timeLeft);
+                    
+                    if (timeLeft <= 0) {
+                        endGame();
+                    }
+                }, 1000);
+            } else {
+                 // 不限時模式，顯示累計時間
+                let elapsed = 0;
+                timerElement.textContent = formatTime(elapsed);
+                timerInterval = setInterval(() => {
+                    elapsed = Math.floor((Date.now() - startTime) / 1000);
+                    timerElement.textContent = formatTime(elapsed);
+                }, 1000);
+            }
+        }
+
+        // 遊戲結束
+        function endGame() {
+            // 檢查是否已經結束，避免重複執行
+            if (!gameActive && targetLetterElement.textContent === 'END') return; 
+            
+            gameActive = false;
+            clearInterval(timerInterval);
+            
+            document.removeEventListener('keydown', handleKeyDown);
+
+            // 計算總用時 (秒)
+            const totalDuration = (initialTime > 0) 
+                ? initialTime 
+                : Math.floor((Date.now() - startTime) / 1000);
+            
+            // 避免除以零
+            const durationInMinutes = totalDuration / 60 || 1 / 60; // 至少用 1 秒來計算速度
+            
+            // 計算星級和百分比
+            const reward = getStarReward(score, totalAnswered);
+            
+            // 計算作答速度
+            const grossCPM = Math.round(totalAnswered / durationInMinutes);
+            const netCPM = Math.round(score / durationInMinutes); 
+            const netWPM = Math.round(netCPM / 5); 
+
+            targetLetterElement.textContent = 'END';
+            
+            // 顯示最終分數和星級
+            messageBoard.innerHTML = `
+                <div class="end-message">挑戰結束！</div>
+                <div id="star-rewards">${reward.stars}</div>
+            `;
+            
+            // 顯示詳細結果
+            resultDetails.innerHTML = `
+                <div class="result-detail">
+                    <strong>📊 統計結果</strong><br>
+                    ▸ 總作答題數: ${totalAnswered} (對 ${score} 次 / 錯 ${wrongCount} 次)<br>
+                    ▸ 答題準確率: <strong>${reward.percentage}%</strong><br>
+                    ▸ 總花費時間: ${formatTime(totalDuration)}<br>
+                    <br>
+                    <strong>🚀 作答速度</strong><br>
+                    ▸ 每分鐘作答題數 (CPM): <strong>${grossCPM}</strong><br>
+                    ▸ 準確打字速度 (WPM): <strong>${netWPM}</strong> (淨字/分鐘)<br>
+                </div>
+            `;
+            resultDetails.style.display = 'block';
+
+            // 處理全對獎勵
+            if (reward.isPerfect && score > 0) {
+                perfectStar.classList.add('show-perfect');
+            }
+
+            // 重置按鈕
+            startButton.textContent = '重新開始';
+            startButton.style.display = 'block';
+            startButton.disabled = false;
+            stopButton.style.display = 'none';
+
+            // 重新啟用控制項
+            challengeTimeSelect.disabled = false;
+            includeUppercase.disabled = false;
+            includeLowercase.disabled = false;
+            includeSymbols.disabled = false;
+        }
+
+        // 鍵盤事件處理函數
+        function handleKeyDown(event) {
+            if (!gameActive) return;
+            
+            if (event.key.length > 1 && event.key !== ' ') return; 
+
+            const pressedKey = event.key; 
+
+            if (availableChars.includes(pressedKey)) {
+                if (pressedKey === currentTarget) {
+                    // ✅ 答對了！
+                    score++;
+                    applyCorrectEffect();
+                    messageBoard.textContent = '🌟 太棒了！是正確的字元！🎉';
+                    messageBoard.className = 'correct';
+                    setTimeout(setNextTarget, 100); 
+                } else {
+                    // ❌ 答錯了！
+                    wrongCount++;
+                    applyWrongEffect();
+                    messageBoard.textContent = `哎呀，你按了 ${pressedKey}。請試試 ${currentTarget} 唷！🥺`;
+                    messageBoard.className = 'wrong';
+                }
+            } else {
+                 if (event.key.match(/^[a-zA-Z0-9!@#$%^&*()]$/)) {
+                     applyWrongEffect();
+                     messageBoard.textContent = `請專心看要按的字元唷！`;
+                     messageBoard.className = 'wrong';
+                 }
+            }
+            
+            updateScoreboard(); // 實時更新所有數據
+        }
+
+        // 遊戲初始化/重置
+        function startGame() {
+            // 修正：在開始前先確保沒有計時器在跑
+            clearInterval(timerInterval); 
+            
+            if (gameActive) return;
+
+            initialTime = parseInt(challengeTimeSelect.value);
+            timeLeft = initialTime; // 修正：確保 timeLeft 初始化正確
+            
+            score = 0;
+            wrongCount = 0;
+            totalAnswered = 0;
+            gameActive = true;
+            
+            // 清理介面
+            perfectStar.classList.remove('show-perfect');
+            resultDetails.style.display = 'none';
+            
+            updateScoreboard(); 
+            messageBoard.textContent = 'GO! GO! GO!';
+            
+            // 隱藏/顯示按鈕
+            startButton.style.display = 'none';
+            stopButton.style.display = 'block';
+
+            // 禁用控制項
+            challengeTimeSelect.disabled = true;
+            includeUppercase.disabled = true;
+            includeLowercase.disabled = true;
+            includeSymbols.disabled = true;
+
+            updateAvailableChars();
+            setNextTarget();
+            startTimer();
+            
+            document.addEventListener('keydown', handleKeyDown);
+        }
+
+        // 初始設定
+        document.addEventListener('DOMContentLoaded', () => {
+            targetLetterElement.textContent = '準備';
+            updateAvailableChars(); 
+            // 修正：初始時顯示選單設定的時間，而非 '0'
+            timerElement.textContent = formatTime(parseInt(challengeTimeSelect.value)); 
+            updateScoreboard();
+        });
+        
+        // 開始按鈕事件
+        startButton.addEventListener('click', startGame);
+        
+        // 停止按鈕事件
+        stopButton.addEventListener('click', endGame);
+        
+        // 改變時間選項時，更新顯示的時間
+        challengeTimeSelect.addEventListener('change', () => {
+             const selectedTime = parseInt(challengeTimeSelect.value);
+             if (!gameActive) {
+                timerElement.textContent = formatTime(selectedTime);
+             }
+        });
+
+    </script>
+
+</body>
+</html>
